@@ -60,5 +60,7 @@ RUN stack config --system-ghc set system-ghc --global true && \
 # Install global packages.
 RUN cabal install phoityne-vscode alex c2hs cpphs doctest happy haskell-dap hlint stylish-haskell hoogle retrie QuickCheck
 
+RUN echo "test"
+
 ENV DEBIAN_FRONTEND=dialog
 ENTRYPOINT ["/bin/bash"]

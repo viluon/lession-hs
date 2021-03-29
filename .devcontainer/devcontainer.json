@@ -19,8 +19,8 @@
         "eriksik2.vscode-ghci",
         "edka.haskutil",
         "sergey-kintsel.haskell-formatter-vscode-extension",
-        "MustafaHafidi.liquidhaskell-diagnostics",
+        // "MustafaHafidi.liquidhaskell-diagnostics",
         "coenraads.bracket-pair-colorizer-2",
         "sheaf.groovylambda",
-    ],
+    ]
 }

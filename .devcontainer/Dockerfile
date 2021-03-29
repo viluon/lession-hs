@@ -12,7 +12,12 @@ ENV USERNAME=haskeller \
 
 
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends git curl xz-utils gcc make libtinfo5 libgmp-dev zlib1g-dev bash sudo procps lsb-release ca-certificates build-essential curl libffi-dev libffi6 libgmp-dev libgmp10 libncurses-dev libncurses5 libtinfo5 libicu-dev libncurses-dev z3
+RUN apt-get install -y --no-install-recommends \
+                    git curl xz-utils gcc make libtinfo5 libgmp-dev \
+                    zlib1g-dev bash sudo procps lsb-release ca-certificates \
+                    build-essential curl libffi-dev libffi6 libgmp-dev \
+                    libgmp10 libncurses-dev libncurses5 libtinfo5 libicu-dev \
+                    libncurses-dev z3
 
 RUN groupadd --gid $USER_GID $USERNAME && \
     useradd -ms /bin/bash -K MAIL_DIR=/dev/null --uid $USER_UID --gid $USER_GID -m $USERNAME && \
@@ -41,11 +46,11 @@ RUN echo "Checking, whether GHC(${GHC_VERSION}) is already installed" && \
 # Set the GHC version.
 RUN ghcup set ghc ${GHC_VERSION}
 
-# Install cabal-iinstall
+# Install cabal-install
 RUN ghcup install cabal
 
 # Update Cabal.
-RUN cabal update && cabal new-install cabal-install
+RUN cabal update && cabal new-install -j2 cabal-install
 
 RUN curl -sSL https://get.haskellstack.org/ | sh
 
@@ -58,7 +63,9 @@ RUN stack config --system-ghc set system-ghc --global true && \
     stack config --system-ghc set resolver $STACK_RESOLVER
 
 # Install global packages.
-RUN cabal install phoityne-vscode alex c2hs cpphs doctest happy haskell-dap hlint stylish-haskell hoogle retrie QuickCheck
+RUN cabal install -j2 phoityne-vscode alex c2hs cpphs doctest \
+                      happy haskell-dap hlint stylish-haskell \
+                      hoogle retrie QuickCheck
 
 ENV DEBIAN_FRONTEND=dialog
 ENTRYPOINT ["/bin/bash"]

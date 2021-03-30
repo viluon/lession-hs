@@ -50,7 +50,7 @@ RUN ghcup set ghc ${GHC_VERSION}
 RUN ghcup install cabal
 
 # Update Cabal.
-RUN cabal update && cabal new-install -j2 cabal-install
+RUN cabal update && cabal new-install -j cabal-install
 
 RUN curl -sSL https://get.haskellstack.org/ | sh
 
@@ -63,9 +63,9 @@ RUN stack config --system-ghc set system-ghc --global true && \
     stack config --system-ghc set resolver $STACK_RESOLVER
 
 # Install global packages.
-RUN cabal install -j2 phoityne-vscode alex c2hs cpphs doctest \
-                      happy haskell-dap hlint stylish-haskell \
-                      hoogle retrie QuickCheck
+RUN cabal install -j phoityne-vscode alex c2hs cpphs doctest \
+                     happy haskell-dap hlint stylish-haskell \
+                     hoogle retrie QuickCheck
 
 ENV DEBIAN_FRONTEND=dialog
 ENTRYPOINT ["/bin/bash"]

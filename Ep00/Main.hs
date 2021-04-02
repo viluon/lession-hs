@@ -208,6 +208,11 @@ recipFacts''' = [1, 1, 1 / 2, 1 / 6, 1 / 24, 1 / 120]
 recipFacts'' :: [Double]
 recipFacts'' = 1 : 1 : 1 / 2 : 1 / 6 : 1 / 24 : 1 / 120 : []
 
+
+
+
+
+
 recipFacts' :: [Double]
 recipFacts' = map (\i -> 1 / fact i) [0..]
   where
@@ -216,6 +221,20 @@ recipFacts' = map (\i -> 1 / fact i) [0..]
 
     fact :: Int -> Double
     fact = error "to-do"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 recipFacts :: [Double]
 recipFacts = go 1

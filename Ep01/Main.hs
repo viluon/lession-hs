@@ -1,11 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, EmptyCase #-}
-{-# OPTIONS_GHC -Wincomplete-patterns #-}
+{-# LANGUAGE EmptyCase, FlexibleInstances #-}
+{-# OPTIONS_GHC -Wincomplete-patterns -Wunused-matches #-}
 
 module Ep01.Main
 where
-
-import Prelude hiding (Bool(..), filter)
-import qualified Prelude as Builtin (Bool(..))
 
 {-
 Část 0: Syntax datových typů
@@ -13,29 +10,30 @@ import qualified Prelude as Builtin (Bool(..))
 
 -}
 
-data Bool = True | False -- ≃ { True, False }
+data Bol = Tru | Fals -- ≃ { Tru, Fals }
 
-not :: Bool -> Bool
+not :: Bol -> Bol
 not b = case b of
-          True  -> False
-          False -> True
+          Tru  -> Fals
+          Fals -> Tru
 
-and :: Bool -> Bool -> Bool
-and True True = True
-and _    _    = False
-
-
+and :: Bol -> Bol -> Bol
+and Tru Tru = Tru
+and _    _    = Fals
 
 
 
 
-instance Eq Bool where
-  True  == True  = Builtin.True
-  False == False = Builtin.False
 
-xor :: Bool -> Bool -> Bool
-xor x y | x == y = False
-xor _ _          = True
+
+instance Eq Bol where
+  Tru  == Tru  = True
+  Fals == Fals = True
+  _     == _   = False
+
+xor :: Bol -> Bol -> Bol
+xor x y | x == y = Fals
+xor _ _          = Tru
 
 
 
@@ -56,15 +54,15 @@ people = [ MkPerson "Vincent" "Vega"      40
          , MkPerson "Winston" "Wolfe"     55
          ]
 
-filter _ [] = []
-filter p (x:xs) = case p x of
-                    True  -> x : rest
-                    False -> rest
-  where rest = filter p xs
+filtr _ [] = []
+filtr p (x:xs) = case p x of
+                    Tru  -> x : rest
+                    Fals -> rest
+  where rest = filtr p xs
 
-over limit = filter p people
-  where p (MkPerson _ _ age) | age > limit = True
-        p _                                = False
+over limit = filtr p people
+  where p (MkPerson _ _ age) | age > limit = Tru
+        p _                                = Fals
 
 -- >>> over 40
 
@@ -77,7 +75,7 @@ data IntList' = IntNil | IntCons Int IntList'
 
 
 data List a = Nil | Cons a (List a)
---        ^ pattern-matching na typ
+--        ^ typový parametr
 
 type    IntList = List Int
 type StringList = List String
@@ -90,17 +88,35 @@ type    Map k v = List (k, v)
 
 -}
 
-class Sized a where
-  size :: a -> Int
+data Pair a b = MkPair a b           -- ≃ a × b
+  deriving Show
 
-entropy :: Sized a => a -> Float
-entropy x = logBase 2 (fromIntegral (size x))
+p1 :: Pair (Pair Int Bool) String
+p1 = MkPair (MkPair 1 True) "hello"
+-- >>> p1
 
-instance Sized Bool where
-  size _ = 2
+p2 = MkPair (MkPair 1 2) (MkPair 3 4)
+-- >>> p2
 
--- >>> entropy True
+-- >>> case p2 of MkPair (MkPair one two) (MkPair three four) -> show two
 
+
+
+
+
+
+data OneOf a b = First a | Second b     -- ≃ a ⊕ b
+  deriving Show
+
+e1 :: OneOf String Int
+e1 = Second 4
+
+e2 :: OneOf String Int
+e2 = First "failed :("
+
+safeDiv :: Int -> Int -> OneOf String Int
+safeDiv _ 0 = First "divide by 0"
+safeDiv x y = Second (x `div` y)
 
 
 
@@ -111,10 +127,23 @@ instance Sized Bool where
 
 data Unit = Unit         -- ≃ { Unit }
 
-instance Sized Unit where
-  size Unit = 1
+unitValues = [Unit]
 
--- >>> entropy Unit
+-- >>> unitValues
+
+bolValues = error "to-do"
+
+-- >>> bolValues
+
+pairUnitBolValues :: [Pair Unit Bol]
+pairUnitBolValues = error "to-do"
+
+-- >>> pairUnitBolValues
+
+
+-- >>> length pairUnitBolValues == length bolValues
+
+
 
 
 
@@ -124,36 +153,3 @@ instance Sized Unit where
 
 
 data Void                -- ≃ ∅
-
-instance Sized Void where
-  size v = 0
-
-
-instance (Sized a, Sized b) => Sized (Either a b) where
-  size (Left  x) = 2 * size x
-  size (Right y) = 2 * size y
-
--- >>> size True
-
--- >>> size (Left Unit :: Either Unit Unit)
-
-instance (Sized a, Sized b) => Sized (a, b) where
-  size (x, y) = size x * size y
-
--- >>> entropy (True, True)
-
-
-instance Sized a => Sized (List a) where
-  size Nil         = 2
-  size (Cons x xs) = 2 * size x * size xs
-
--- >>> entropy (Nil :: List Bool)
-
--- >>> size (Cons True Nil)
-
--- >>> entropy (Cons Unit (Cons Unit (Cons Unit Nil)))
-
-s = Cons Unit
-z = Nil
-
--- >>> entropy (s (s (s z)))

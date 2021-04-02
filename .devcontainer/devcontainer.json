@@ -1,6 +1,6 @@
 {
     "name": "DevContainer for Haskell (GHC, Stack, Cabal, HIE, LSP, DAP, etc.)",
-    "dockerFile": "Dockerfile",
+    "dockerFile": "from-ghcr.dockerfile",
     "context":"..",
     "runArgs": [],
     "settings": {

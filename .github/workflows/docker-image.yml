@@ -41,8 +41,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./.devcontainer/
-        push: false
-        tags: user/app:latest
+        push: true
+        tags: ghcr.io/viluon/lession-hs:latest
         build-args: |
           GHC_VERSION=${{ matrix.ghc }}
           STACK_RESOLVER=${{ matrix.resolver }}

@@ -4,6 +4,8 @@
 module Ep01.Main
 where
 
+import Test.QuickCheck (Arbitrary (arbitrary), oneof)
+
 {-
 Část 0: Syntax datových typů
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,7 +157,7 @@ o2 = Second "hi"
 
 
 data OneOf a b = First a | Second b     -- ≃ a ⊕ b
-  deriving Show
+  deriving (Show, Eq)
 
 e1 :: OneOf String Int
 e1 = Second 4
@@ -227,3 +229,8 @@ iso (MkPair a b) = MkPair b a
 iso' :: OneOf a b -> OneOf b a
 iso' (First a) = Second a
 iso' (Second b) = First b
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (OneOf a b) where
+  arbitrary = oneof [fmap First arbitrary, fmap Second arbitrary]
+
+-- prop> \(x :: OneOf Int String) -> id x == (iso' . iso') x

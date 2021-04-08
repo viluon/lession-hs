@@ -44,8 +44,6 @@ grades = ['A' .. 'F']
 
 
 
-
-
 bar = f 4
   where
     -- typ funkcí je (->), narozdíl od matematického zápisu (f: ℝ -> ℝ)
@@ -62,7 +60,6 @@ bar = f 4
 --  | |
 --  | parametr(y)
 --  znovu název
-
 
 
 
@@ -130,7 +127,7 @@ plus(x, y) = x + y
 -- >>> plus(3, 2) * 2
 
 add' :: Int -> (Int -> Int)
-add' x = \y -> x + y
+add' =  \x  -> (\y  -> x + y)
 
 add :: Int -> Int -> Int
 add x y = x + y
@@ -139,9 +136,13 @@ add x y = x + y
 
 -- >>> add 3 2 * 2
 
+-- >>> 3 + 2 * 2
+
 -- >>> ((add 3) 2) * 2
 
 -- >>> add (3 2) * 2
+
+-- >>> add 5 * 2
 
 inc' :: Int -> Int
 inc' = add 1
@@ -161,22 +162,23 @@ inc = (+) 1
 -- Int -> (Int -> (Int -> (Int -> Int)))
 
 curry'' :: ((a, b) -> c) -> (a -> (b -> c))
-curry'' f = \a -> \b -> f(a, b)
+curry'' f = \x -> \y -> f(x, y)
 
 curry'  :: ((a, b) -> c) -> a -> b -> c
-curry'  f a b = f (a, b)
+curry'  f x y = f (x, y)
 
 
 
 add'' = curry' plus
 
-inc'' = curry' plus 1
+inc'' = add'' 1
 
 
 -- n-tice se skládají ze staticky známého přirozeného čísla libovolných typů
 type PixelRGB     = (Int, Int, Int)
 type Point2D      = (Double, Double)
 type Entry        = (String, Int)
+
 type StringIntMap = [Entry]
 
 mag :: Point2D -> Double
@@ -190,6 +192,8 @@ mag (x, y) = sqrt (x^2 + y^2)
 
 -- >>> "abc" ++ "def"
 
+-- >>> [1, 2, 3] ++ [10, 20, 30]
+
 rep :: String -> String
 rep xs = xs ++ rep xs
 
@@ -202,11 +206,28 @@ lolol = rep "lo"
 
 -- >>> take 10 ("tro" ++ lolol)
 
+-- e = ∑_{n ∈ [0, ∞)} 1/(n!)
+
 recipFacts''' :: [Double]
 recipFacts''' = [1, 1, 1 / 2, 1 / 6, 1 / 24, 1 / 120]
 
 recipFacts'' :: [Double]
-recipFacts'' = 1 : 1 : 1 / 2 : 1 / 6 : 1 / 24 : 1 / 120 : []
+recipFacts'' = 1 : 1 : (1 / 2 : (1 / 6 : (1 / 24 : (1 / 120 : []))))
+
+-- >>> exp 1
+
+e'' = sum recipFacts''
+
+-- >>> e''
+
+
+
+
+
+
+
+
+
 
 
 
@@ -221,6 +242,18 @@ recipFacts' = map (\i -> 1 / fact i) [0..]
 
     fact :: Int -> Double
     fact = error "to-do"
+
+
+
+-- >>> sum (take 10 recipFacts')
+
+-- >>> exp 1
+
+
+
+
+
+
 
 
 
@@ -241,15 +274,18 @@ recipFacts = go 1
   where
     go k = 1 : map (/ k) (go (k + 1))
 
---     seznam = 1  :  (1  :  (1  :  (1  :  (...))))
---          k = 1,     2,     3,     4,     ...
--- jmenovatel = 1,     2,     3*2,   4*3*2, ...
+--     seznam = 1 :    1  :  (1  :  (1  :  (1  :  (...))))
+--          k = 1,     2,     3,     4,     5,     ...
+-- jmenovatel =        1,     2,     3*2,   4*3*2, ...
 
--- 1/1  : 1/1  : 1/1  : 1/1  : ...
--- 1/1  : 1/2  : 1/2  : 1/2  : ...
--- 1/1  : 1/2  : 1/6  : 1/6  : ...
--- 1/1  : 1/2  : 1/6  : 1/24 : ...
+-- 1 : 1 : 1/1  : 1/1  : 1/1  : ...
+-- 1 : 1 : 1/2  : 1/2  : 1/2  : ...
+-- 1 : 1 : 1/2  : 1/6  : 1/6  : ...
+-- 1 : 1 : 1/2  : 1/6  : 1/24 : ...
+-- ...
 
--- >>> sum $ takeWhile (> 0) recipFacts'''
+-- >>> length $ takeWhile (> 0) recipFacts
+
+-- >>> sum $ takeWhile (> 0) recipFacts
 
 -- >>> exp 1

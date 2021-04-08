@@ -12,6 +12,10 @@ where
 
 data Bol = Tru | Fals -- ≃ { Tru, Fals }
 
+not' :: Bol -> Bol
+not' Tru  = Fals
+not' Fals = Tru
+
 not :: Bol -> Bol
 not b = case b of
           Tru  -> Fals
@@ -19,17 +23,48 @@ not b = case b of
 
 and :: Bol -> Bol -> Bol
 and Tru Tru = Tru
-and _    _    = Fals
+and _    _  = Fals
 
 
 
 
+class Greeting a where
+  greet :: a -> String
 
+
+instance Greeting Bol where
+  greet Tru  = "hello, Tru"
+  greet Fals = "hi Fals!"
+
+instance Greeting Int where
+  greet this = "how do you do, number " ++ show this ++ "?"
+
+-- >>> greet (3 :: Int)
+
+-- >>> greet Fals
+
+{-
+
+interface Greeting {
+  String greet();
+}            ^ this
+
+class Animal implements Greeting {
+  String greet() {
+    if (this instanceof Dog) {
+      ...
+    } else if () {
+      ...
+    }
+  }
+}
+
+-}
 
 instance Eq Bol where
-  Tru  == Tru  = True
-  Fals == Fals = True
-  _     == _   = False
+  (==) Tru  Tru  = True
+  (==) Fals Fals = True
+  (==) _    _    = False
 
 xor :: Bol -> Bol -> Bol
 xor x y | x == y = Fals
@@ -91,6 +126,9 @@ type    Map k v = List (k, v)
 data Pair a b = MkPair a b           -- ≃ a × b
   deriving Show
 
+p0 :: Pair Bol Ternary
+p0 = MkPair Tru T1
+
 p1 :: Pair (Pair Int Bool) String
 p1 = MkPair (MkPair 1 True) "hello"
 -- >>> p1
@@ -101,6 +139,17 @@ p2 = MkPair (MkPair 1 2) (MkPair 3 4)
 -- >>> case p2 of MkPair (MkPair one two) (MkPair three four) -> show two
 
 
+data Ternary = T1 | T2 | T3
+
+
+o0 :: OneOf Bol Ternary
+o0 = Second T3
+
+o1 :: OneOf Bol Bol
+o1 = First Tru
+
+o2 :: OneOf Bol String
+o2 = Second "hi"
 
 
 
@@ -126,6 +175,7 @@ safeDiv x y = Second (x `div` y)
 
 
 data Unit = Unit         -- ≃ { Unit }
+  deriving Show
 
 unitValues = [Unit]
 
@@ -145,6 +195,8 @@ pairUnitBolValues = error "to-do"
 
 
 
+type Nullable a = OneOf Unit a
+null = Unit
 
 
 
@@ -153,3 +205,25 @@ pairUnitBolValues = error "to-do"
 
 
 data Void                -- ≃ ∅
+
+
+{-
+Část II: Algebraické identity
+=============================
+
+a × 1 ≃ a
+a × b ≃ b × a
+a ⊕ b ≃ b ⊕ a
+a ⊕ 0 ≃ a
+      ^ isomorfní
+
+-}
+
+-- a × b ≃ b × a
+iso :: Pair a b -> Pair b a
+iso (MkPair a b) = MkPair b a
+
+-- a ⊕ b ≃ b ⊕ a
+iso' :: OneOf a b -> OneOf b a
+iso' (First a) = Second a
+iso' (Second b) = First b
